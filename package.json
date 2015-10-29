@@ -1,0 +1,22 @@
+{
+  "name": "twitch-master",
+  "version": "1.0.0",
+  "description": "Read input from Twitch, and send keys to other programs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/twitchinstallsarchlinux/twitch-master.git"
+  },
+  "author": "John Ott",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/twitchinstallsarchlinux/twitch-master/issues"
+  },
+  "homepage": "https://github.com/twitchinstallsarchlinux/twitch-master#readme",
+  "dependencies": {
+    "zmq": "^2.13.0"
+  }
+}
