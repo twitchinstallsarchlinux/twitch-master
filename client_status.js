@@ -1,4 +1,4 @@
-var sub = require('./lib/comm').receiver('client-console', true);
+var sub = require('./lib/comm').receiver('client-status', true);
 console.log('Connecting to master...');
 
 sub.on('connect', function() {

@@ -2,8 +2,37 @@ var fs  = require('fs');
 var irc = require('irc');
 var pub = require('./lib/comm').sender();
 
+
+process.stdin.resume();
+process.stdin.on('data', function(data) {
+  process.stdout.write('Control: ' + data);
+  var args = data.toString().split(' ');
+  switch(args[0]) {
+    case 'map_load':
+      map_load();
+      break;
+    default:
+      pub.send(args);
+      break;
+  }
+});
+
 // Load json command mapping
-var map = JSON.parse(fs.readFileSync('map.json', 'utf8'));
+var map = {}
+
+function map_load() {
+  fs.exists('map.json', function() {
+    try {
+      var map_new = JSON.parse(fs.readFileSync('map.json', 'utf8'));
+      map = map_new;
+      console.log('(Re)loaded map.json');
+    } catch (ex) {
+      console.log('Could not load map.json');
+    }
+  });
+}
+
+map_load();
 
 // Load json config
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -53,11 +82,11 @@ setInterval(function() {
   if (top_array.length > 0) {
     var selected_command = top_array[Math.floor(Math.random()*top_array.length)];
     console.log('Selected: ' + selected_command);
-    pub.send(['client-console', 'WINNING COMMAND: ' + selected_command]);
+    pub.send(['client-status', 'WINNING COMMAND: ' + selected_command]);
     pub.send(['qemu-master', map[selected_command]]);
   } else {
     console.log('Not enough votes');
-    pub.send(['client-console', 'NOT ENOUGH VOTES PLACED!']);
+    pub.send(['client-status', 'NOT ENOUGH VOTES PLACED!']);
   }
 
   // Clear last tally
