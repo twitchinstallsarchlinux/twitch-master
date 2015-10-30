@@ -5,13 +5,13 @@ var spawn = require('child_process').spawn;
 
 var child = spawn('bash', ['lib/launch.sh']);
 
-/*child.stdout.on('data', function(data) {
+child.stdout.on('data', function(data) {
   console.log('QEMU: ' + data);
 });
 
 child.stderr.on('data', function(data) {
   console.log('ERR QEMU: ' + data);
-});*/
+});
 
 sub.on('connect', function() {
   console.log('Connected to master');
@@ -25,4 +25,10 @@ sub.on('message', function() {
   var msg = arguments[1].toString();
   process.stdout.write('> ' + msg);
   child.stdin.write(msg);
+});
+
+process.stdin.resume();
+
+process.stdin.on('data', function(data) {
+  child.stdin.write(data.toString());
 });
