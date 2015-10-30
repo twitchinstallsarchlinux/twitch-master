@@ -6,7 +6,7 @@ case "$1" in
   ;;
 "client_status")
   xrdb lib/urxvt-config
-  urxvt256c -geometry 84x48 -e bash -c 'echo -ne "\033]0;client_status\007"; node client_status.js'
+  urxvt256c -geometry 104x10 -e bash -c 'echo -ne "\033]0;client_status\007"; node client_status.js'
   ;;
 "client_vnc")
   vncviewer -Shared -geometry=640x480 localhost:0
