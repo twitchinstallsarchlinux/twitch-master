@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/twitchinstallsarchlinux/twitch-master#readme",
   "dependencies": {
+    "irc": "^0.4.0",
     "zmq": "^2.13.0"
   }
 }
