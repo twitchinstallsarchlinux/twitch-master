@@ -53,5 +53,10 @@
   "Z": "sendkey shift-z",
   "backspace": "sendkey backspace",
   "enter": "sendkey ret",
-  "space": "sendkey space"
+  "space": "sendkey spc",
+  "tab": "sendkey tab",
+  "up": "sendkey up",
+  "down": "sendkey down",
+  "left": "sendkey left",
+  "right": "sendkey right"
 }
