@@ -58,6 +58,7 @@
   ":": "sendkey shift-semicolon",
   "=": "sendkey equal",
   ">": "sendkey greater",
+  "escape": "sendkey esc",
   "backspace": "sendkey backspace",
   "enter": "sendkey ret",
   "space": "sendkey spc",
