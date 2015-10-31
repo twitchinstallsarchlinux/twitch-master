@@ -44,7 +44,7 @@ map_load();
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 var twitch_chat = new irc.Client('irc.twitch.tv', config['nick'], {
-    channels: [config['channel']],
+    channels: ['#' + config['nick']],
     userName: config['nick'],
     password: config['password'],
     autoConnect: false
@@ -56,10 +56,10 @@ twitch_chat.connect(0, function() {
 
 var last_tally = {};
 
-twitch_chat.addListener('message' + config['channel'], function(from, msg) {
+twitch_chat.addListener('message#' + config['nick'], function(from, msg) {
   msg = msg.trim();
   if (map[msg] != null) {
-    //console.log(from + ': ' + msg + ' -> ' + map[msg]);
+    console.log(from + ': ' + msg + ' -> ' + map[msg]);
     pub.send(['client-console', '> ' + from + ': ' + msg]);
     last_tally[from.trim()] = msg;
   }
@@ -153,4 +153,4 @@ setInterval(function() {
 
   // Clear last tally
   last_tally = {};
-}, 15 * 1000);
+}, 5 * 1000);
