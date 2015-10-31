@@ -102,7 +102,7 @@ setInterval(function() {
   for (var index in commands) {
     var command = commands[index];
     counts += '\'' + command + '\' = ' + Math.round(command_count[command]/Object.keys(last_tally).length * 100, 2) + '%';
-    if (index != Object.keys(commands).length)
+    if (index != Object.keys(commands).length - 1)
       counts += ', '
   }
 
