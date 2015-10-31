@@ -26,7 +26,7 @@ function iter() {
   var next = Object.keys(map)[length];
   if (next != null) {
     console.log('Sending: ' + next + ' -> ' + map[next]);
-    pub.send(['qemu-manager', map[next]]);
+    pub.send(['qemu-manager', map[next] + '\n']);
     length++;
     setTimeout(iter, 2 * 1000);
   } else {
