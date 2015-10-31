@@ -86,7 +86,10 @@ setInterval(function() {
     console.log('Selected: ' + selected_command);
     twitch_chat.say('#' + config['nick'], 'Winning command: ' + selected_command);
     pub.send(['client-status', 'WINNING COMMAND: ' + selected_command]);
-    pub.send(['qemu-master', map[selected_command]]);
+    if (map[selected_command] != "") {
+      console.log('Sending to qemu: ' + map[selected_command]);
+      pub.send(['qemu-master', map[selected_command]]);
+    }
   } else {
     console.log('Not enough votes');
     twitch_chat.say('#' + config['nick'], 'Not enough votes');

@@ -142,5 +142,6 @@
   "ctrl-w": "sendkey ctrl-w",
   "ctrl-x": "sendkey ctrl-x",
   "ctrl-y": "sendkey ctrl-y",
-  "ctrl-z": "sendkey ctrl-z"
+  "ctrl-z": "sendkey ctrl-z",
+  "nop": ""
 }
