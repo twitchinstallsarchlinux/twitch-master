@@ -143,5 +143,7 @@
   "ctrl-x": "sendkey ctrl-x",
   "ctrl-y": "sendkey ctrl-y",
   "ctrl-z": "sendkey ctrl-z",
-  "nop": ""
+  "nop": "",
+  "system_reset": "VOTE system_reset",
+  "yes": ""
 }

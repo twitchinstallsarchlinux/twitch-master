@@ -11,6 +11,10 @@ process.stdin.on('data', function(data) {
     case 'map_load':
       map_load();
       break;
+    case 'reset_voting':
+      // For when this inevitably breaks
+      voting_command = null;
+      break;
     default:
       console.log("Sending... ", args);
       pub.send(args);
@@ -61,6 +65,8 @@ twitch_chat.addListener('message#' + config['nick'], function(from, msg) {
   }
 });
 
+var voting_command = null;
+
 setInterval(function() {
   var command_count = {};
   for (var user in last_tally) {
@@ -86,7 +92,34 @@ setInterval(function() {
     console.log('Selected: ' + selected_command);
     twitch_chat.say('#' + config['nick'], 'Winning command: ' + selected_command);
     pub.send(['client-status', 'WINNING COMMAND: ' + selected_command]);
-    if (map[selected_command] != "") {
+
+    if (voting_command != null) {
+      // We are voting to run a dangerous command
+      if (selected_command == 'yes') {
+        console.log('Vote succeeded: ' + voting_command);
+        twitch_chat.say('#' + config['nick'], 'Vote succeeded: ' + voting_command)
+        pub.send(['client-status', 'VOTING SUCCEEDED: ' + voting_command]);
+
+        // Send
+        var command_qemu = map[voting_command].replace(/^VOTE /, '');
+        console.log('Sending to qemu: ' + command_qemu);
+        pub.send(['qemu-master', command_qemu]);
+
+        voting_command = null;
+      } else {
+        console.log('Vote failed: ' + voting_command);
+        twitch_chat.say('#' + config['nick'], 'Vote failed: ' + voting_command)
+        pub.send(['client-status', 'VOTING FAILED: ' + voting_command]);
+        voting_command = null;
+      }
+    } else if (map[selected_command].indexOf("VOTE") == 0) {
+      // This command requires a vote
+      console.log('Voting on command: ' + selected_command);
+      twitch_chat.say('#' + config['nick'], 'Vote \'yes\' to run this command: ' + selected_command);
+      pub.send(['client-status', 'VOTING ON COMMAND (yes to run this command): ' + selected_command]);
+      voting_command = selected_command;
+    } else if (map[selected_command] != "") {
+      // Normal command, not NOOP
       console.log('Sending to qemu: ' + map[selected_command]);
       pub.send(['qemu-master', map[selected_command]]);
     }
