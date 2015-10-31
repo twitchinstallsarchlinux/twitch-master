@@ -1,6 +1,7 @@
 var fs  = require('fs');
 var pub = require('./lib/comm').sender();
 
+var TIMEOUT = 500;
 
 // Load json command mapping
 var map = {}
@@ -28,10 +29,10 @@ function iter() {
     console.log('Sending: ' + next + ' -> ' + map[next]);
     pub.send(['qemu-manager', map[next] + '\n']);
     length++;
-    setTimeout(iter, 2 * 1000);
+    setTimeout(iter, TIMEOUT);
   } else {
     console.log('Done!');
   }
 }
 
-setTimeout(iter, 2 * 1000);
+setTimeout(iter, TIMEOUT);
