@@ -82,10 +82,12 @@ setInterval(function() {
   if (top_array.length > 0) {
     var selected_command = top_array[Math.floor(Math.random()*top_array.length)];
     console.log('Selected: ' + selected_command);
+    twitch_chat.say('#' + config['nick'], 'Winning command: ' + selected_command);
     pub.send(['client-status', 'WINNING COMMAND: ' + selected_command]);
     pub.send(['qemu-master', map[selected_command]]);
   } else {
     console.log('Not enough votes');
+    twitch_chat.say('#' + config['nick'], 'Not enough votes');
     pub.send(['client-status', 'NOT ENOUGH VOTES PLACED!']);
   }
 
