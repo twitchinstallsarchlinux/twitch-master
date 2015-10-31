@@ -7,11 +7,12 @@ process.stdin.resume();
 process.stdin.on('data', function(data) {
   process.stdout.write('Control: ' + data);
   var args = data.toString().split(' ');
-  switch(args[0]) {
+  switch(args[0].trim()) {
     case 'map_load':
       map_load();
       break;
     default:
+      console.log("Sending... ", args);
       pub.send(args);
       break;
   }
@@ -28,6 +29,7 @@ function map_load() {
       console.log('(Re)loaded map.json');
     } catch (ex) {
       console.log('Could not load map.json');
+      console.log(ex);
     }
   });
 }
