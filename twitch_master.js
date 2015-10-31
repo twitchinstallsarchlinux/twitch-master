@@ -153,4 +153,4 @@ setInterval(function() {
 
   // Clear last tally
   last_tally = {};
-}, 5 * 1000);
+}, 15 * 1000);
