@@ -77,14 +77,33 @@ setInterval(function() {
 
   var top_array = [];
   var top_count = 0;
+  var second_array = [];
+  var second_count = 0;
   for (var command in command_count) {
     if (command_count[command] > top_count) {
+      second_array = top_array.slice();
+      second_count = top_count;
       top_array = [];
       top_array.push(command);
       top_count = command_count[command];
     } else if (command_count[command] == top_count) {
       top_array.push(command);
+    } else if (command_count[command] > second_count) {
+      second_array = [];
+      second_array.push(command);
+      second_count = command_count[command]
+    } else if (command_count[command] == second_count) {
+      second_array.push(command);
     }
+  }
+
+  var counts = '';
+  var commands = top_array.concat(second_array);
+  for (var index in commands) {
+    var command = commands[index];
+    counts += '\'' + command + '\' = ' + Math.round(command_count[command]/Object.keys(last_tally).length * 100, 2) + '%';
+    if (index != Object.keys(commands).length)
+      counts += ', '
   }
 
   if (top_array.length > 0) {
@@ -92,6 +111,9 @@ setInterval(function() {
     console.log('Selected: ' + selected_command);
     twitch_chat.say('#' + config['nick'], 'Winning command: ' + selected_command);
     pub.send(['client-status', 'WINNING COMMAND: ' + selected_command]);
+    console.log('Votes: ' + counts);
+    twitch_chat.say('#' + config['nick'], 'Votes: ' + counts);
+    pub.send(['client-status', 'VOTES: ' + counts]);
 
     if (voting_command != null) {
       // We are voting to run a dangerous command
