@@ -98,4 +98,4 @@ setInterval(function() {
 
   // Clear last tally
   last_tally = {};
-}, 10 * 1000);
+}, 5 * 1000);
