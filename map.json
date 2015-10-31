@@ -145,5 +145,7 @@
   "ctrl-z": "sendkey ctrl-z",
   "nop": "",
   "system_reset": "VOTE system_reset",
+  "boot_cd": "VOTE boot_set dc",
+  "boot_drive": "VOTE boot_set cd",
   "yes": ""
 }
