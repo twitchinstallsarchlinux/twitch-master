@@ -2,6 +2,7 @@ var fs  = require('fs');
 var irc = require('irc');
 var pub = require('./lib/comm').sender();
 
+var command_interval = 15;
 var command_mode = 'anarchy';
 // possible values: democracy, anarchy
 
@@ -35,6 +36,16 @@ process.stdin.on('data', function(data) {
       command_mode = 'democracy';
       last_tally = {};
       reportStatus('DEMOCRACY is now in effect');
+      break;
+    
+    case 'set_interval':
+      var new_interval = +args[1];
+      if (new_interval >= 1) {
+        command_interval = new_interval;
+        reportStatus('VOTING INTERVAL is now ' + new_interval + ' seconds');
+      } else {
+        console.log('Trouble parsing command interval seconds, try again');
+      }
       break;
       
     default:
@@ -203,4 +214,4 @@ setInterval(function() {
     twitch_chat.say('#' + config['nick'], 'Not enough votes');
     pub.send(['client-status', 'NOT ENOUGH VOTES PLACED!']);
   }
-}, 15 * 1000);
+}, command_interval * 1000);
