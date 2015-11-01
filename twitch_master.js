@@ -22,22 +22,20 @@ process.stdin.on('data', function(data) {
     case 'map_load':
       map_load();
       break;
+
     case 'reset_voting':
       // For when this inevitably breaks
       voting_command = null;
       break;
-      
+
     case 'anarchy':
-      command_mode = 'anarchy';
-      last_command = null;
-      reportStatus('ANARCHY is now in effect');
+      setCommandMode('anarchy');
       break;
+
     case 'democracy':
-      command_mode = 'democracy';
-      last_tally = {};
-      reportStatus('DEMOCRACY is now in effect');
+      setCommandMode('democracy');
       break;
-    
+
     case 'set_interval':
       var new_interval = +args[1];
       if (new_interval >= 1) {
@@ -167,6 +165,24 @@ function anarchy() {
   }
 }
 
+function setCommandMode(mode) {
+
+  switch(mode) {
+    case 'anarchy':
+      command_mode = 'anarchy';
+      last_command = null;
+      reportStatus('ANARCHY is now in effect');
+      break;
+    case 'democracy':
+      command_mode = 'democracy';
+      last_tally = {};
+      reportStatus('DEMOCRACY is now in effect');
+      break;
+    default:
+      break;
+  }
+}
+
 function processCommand() {
   var next_ms = command_interval * 1000;
   if (command_mode == 'anarchy' && !voting_command) {
@@ -191,8 +207,14 @@ function processCommand() {
         twitch_chat.say('#' + config['nick'], 'Vote succeeded: ' + voting_command)
         pub.send(['client-status', 'VOTING SUCCEEDED: ' + voting_command]);
 
+        // Replace VOTE
+        var cmd = map[voting_command].replace(/^VOTE /, '');
+        if ((cmd == 'democracy' || cmd == 'anarchy')) {
+          setCommandMode(cmd);
+        }
+        
         // Send
-        var command_qemu = map[voting_command].replace(/^VOTE /, '');
+        var command_qemu = cmd;
         console.log('Sending to qemu: ' + command_qemu);
         pub.send(['qemu-master', command_qemu]);
       } else {
