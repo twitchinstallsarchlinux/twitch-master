@@ -209,14 +209,17 @@ function processCommand() {
 
         // Replace VOTE
         var cmd = map[voting_command].replace(/^VOTE /, '');
+
+        // Set mode
         if ((cmd == 'democracy' || cmd == 'anarchy')) {
           setCommandMode(cmd);
+        } else {
+
+          // Send Command
+          var command_qemu = cmd;
+          console.log('Sending to qemu: ' + command_qemu);
+          pub.send(['qemu-master', command_qemu]);
         }
-        
-        // Send
-        var command_qemu = cmd;
-        console.log('Sending to qemu: ' + command_qemu);
-        pub.send(['qemu-master', command_qemu]);
       } else {
         console.log('Vote failed: ' + voting_command);
         twitch_chat.say('#' + config['nick'], 'Vote failed: ' + voting_command)
