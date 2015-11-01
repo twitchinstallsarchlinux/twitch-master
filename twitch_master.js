@@ -167,7 +167,14 @@ function anarchy() {
   }
 }
 
-setInterval(function() {
+function processCommand() {
+  var next_ms = command_interval * 1000;
+  if (command_mode == 'anarchy' && !voting_command) {
+    // Smudges timer by random amounts. Last # is smudge factor.
+    next_ms += Math.round((Math.random() - 0.5) * 2 * next_ms * 0.1)
+  }
+  setTimeout(processCommand, next_ms);
+  
   var selected_command;
   
   if (command_mode == 'democracy' || voting_command != null) {
@@ -214,4 +221,7 @@ setInterval(function() {
     twitch_chat.say('#' + config['nick'], 'Not enough votes');
     pub.send(['client-status', 'NOT ENOUGH VOTES PLACED!']);
   }
-}, command_interval * 1000);
+}
+
+// Set the first voting timer
+setTimeout(processCommand, command_interval * 1000);
