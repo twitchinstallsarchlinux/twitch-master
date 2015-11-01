@@ -119,7 +119,7 @@
   "alt-f9": "sendkey alt-f9",
   "ctrl-a": "sendkey ctrl-a",
   "ctrl-b": "sendkey ctrl-b",
-  "ctrl-c": "sendkey ctrl-c",
+  "ctrl-c": "VOTE sendkey ctrl-c",
   "ctrl-d": "sendkey ctrl-d",
   "ctrl-e": "sendkey ctrl-e",
   "ctrl-f": "sendkey ctrl-f",
