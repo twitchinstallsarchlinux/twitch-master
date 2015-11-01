@@ -8,7 +8,7 @@ var command_mode = 'anarchy';
 function reportStatus(message) {
   pub.send(['client-status', message]);
 
-  if (twitch_chat) {
+  if (twitch_chat && config) {
     twitch_chat.say('#' + config['nick'], message);
   }
 }
