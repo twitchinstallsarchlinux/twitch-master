@@ -3,8 +3,12 @@ var irc = require('irc');
 var pub = require('./lib/comm').sender();
 
 var command_interval = 15;
-var command_mode = 'anarchy';
+
 // possible values: democracy, anarchy
+var command_mode = 'anarchy';
+
+//smudge values when in anarchy mode. 0.3 = 30%
+var smudge_factor = 0.3;
 
 function reportStatus(message) {
   pub.send(['client-status', message]);
@@ -186,8 +190,8 @@ function setCommandMode(mode) {
 function processCommand() {
   var next_ms = command_interval * 1000;
   if (command_mode == 'anarchy' && !voting_command) {
-    // Smudges timer by random amounts. Last # is smudge factor.
-    next_ms += Math.round((Math.random() - 0.5) * 2 * next_ms * 0.1)
+    // Smudges timer by random amounts. "smudge_factor" is skew percentage.
+    next_ms += ((Math.random() - 0.5)*2) * next_ms * smudge_factor;
   }
   setTimeout(processCommand, next_ms);
   
