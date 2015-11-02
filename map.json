@@ -147,5 +147,7 @@
   "system_reset": "VOTE system_reset",
   "boot_cd": "VOTE boot_set dc",
   "boot_drive": "VOTE boot_set cd",
+  "democracy": "VOTE democracy",
+  "anarchy": "VOTE anarchy",
   "yes": ""
 }
