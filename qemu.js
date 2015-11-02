@@ -3,6 +3,8 @@ console.log('Connecting to master...');
 sub.monitor();
 
 var child = null;
+var spawn = require('child_process').spawn;
+
 function spawn_process(child_process) {
   child_process = spawn('bash', ['lib/launch.sh']);
 
