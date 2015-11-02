@@ -86,7 +86,7 @@
   "slash": "sendkey slash",
   "?": "sendkey shift-slash",
   "backslash": "sendkey backslash",
-  "|": "sendkey shift-backslash"
+  "|": "sendkey shift-backslash",
   "[": "sendkey bracket_left",
   "]": "sendkey bracket_right",
   "{": "sendkey shift-bracket_left",
