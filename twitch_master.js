@@ -2,6 +2,21 @@ var fs  = require('fs');
 var irc = require('irc');
 var pub = require('./lib/comm').sender();
 
+var command_interval = 15;
+
+// possible values: democracy, anarchy
+var command_mode = 'anarchy';
+
+//smudge values when in anarchy mode. 0.3 = 30%
+var smudge_factor = 0.3;
+
+function reportStatus(message) {
+  pub.send(['client-status', message]);
+
+  if (twitch_chat && config) {
+    twitch_chat.say('#' + config['nick'], message);
+  }
+}
 
 process.stdin.resume();
 process.stdin.on('data', function(data) {
@@ -11,12 +26,32 @@ process.stdin.on('data', function(data) {
     case 'map_load':
       map_load();
       break;
+
     case 'reset_voting':
       // For when this inevitably breaks
       voting_command = null;
       break;
+
+    case 'anarchy':
+      setCommandMode('anarchy');
+      break;
+
+    case 'democracy':
+      setCommandMode('democracy');
+      break;
+
+    case 'set_interval':
+      var new_interval = +args[1];
+      if (new_interval >= 1) {
+        command_interval = new_interval;
+        reportStatus('VOTING INTERVAL is now ' + new_interval + ' seconds');
+      } else {
+        console.log('Trouble parsing command interval seconds, try again');
+      }
+      break;
+      
     default:
-      console.log("Sending... ", args);
+      console.log("Sending...", args);
       pub.send(args);
       break;
   }
@@ -55,6 +90,7 @@ twitch_chat.connect(0, function() {
 });
 
 var last_tally = {};
+var last_command;
 
 twitch_chat.addListener('message#' + config['nick'], function(from, msg) {
   msg = msg.trim();
@@ -62,12 +98,13 @@ twitch_chat.addListener('message#' + config['nick'], function(from, msg) {
     console.log(from + ': ' + msg + ' -> ' + map[msg]);
     pub.send(['client-console', '> ' + from + ': ' + msg]);
     last_tally[from.trim()] = msg;
+    last_command = msg;
   }
 });
 
 var voting_command = null;
 
-setInterval(function() {
+function democracy() {
   var command_count = {};
   for (var user in last_tally) {
     if (command_count[last_tally[user]] == null)
@@ -106,15 +143,67 @@ setInterval(function() {
       counts += ', '
   }
 
+  // Clear out tally info for next time
+  last_tally = {};
+
   if (top_array.length > 0) {
     var selected_command = top_array[Math.floor(Math.random()*top_array.length)];
-    console.log('Selected: ' + selected_command);
-    twitch_chat.say('#' + config['nick'], 'Winning command: ' + selected_command);
-    pub.send(['client-status', 'WINNING COMMAND: ' + selected_command]);
-    console.log('Votes: ' + counts);
-    twitch_chat.say('#' + config['nick'], 'Votes: ' + counts);
-    pub.send(['client-status', 'VOTES: ' + counts]);
 
+    console.log('Selected: ' + selected_command);
+    reportStatus('Winning command: ' + selected_command);
+
+    console.log('Votes: ' + counts);
+    reportStatus('VOTES: ' + counts);
+
+    return selected_command;
+  }
+}
+
+function anarchy() {
+  if (last_command) {
+    var selected_command = last_command;
+    last_command = null;
+    
+    reportStatus('Winning command: ' + selected_command);
+    return selected_command;
+  }
+}
+
+function setCommandMode(mode) {
+
+  switch(mode) {
+    case 'anarchy':
+      command_mode = 'anarchy';
+      last_command = null;
+      reportStatus('ANARCHY is now in effect');
+      break;
+    case 'democracy':
+      command_mode = 'democracy';
+      last_tally = {};
+      reportStatus('DEMOCRACY is now in effect');
+      break;
+    default:
+      break;
+  }
+}
+
+function processCommand() {
+  var next_ms = command_interval * 1000;
+  if (command_mode == 'anarchy' && !voting_command) {
+    // Smudges timer by random amounts. "smudge_factor" is skew percentage.
+    next_ms += ((Math.random() - 0.5)*2) * next_ms * smudge_factor;
+  }
+  setTimeout(processCommand, next_ms);
+  
+  var selected_command;
+  
+  if (command_mode == 'democracy' || voting_command != null) {
+    selected_command = democracy();
+  } else if (command_mode == 'anarchy') {
+    selected_command = anarchy();
+  }
+
+  if (selected_command) {
     if (voting_command != null) {
       // We are voting to run a dangerous command
       if (selected_command == 'yes') {
@@ -122,35 +211,46 @@ setInterval(function() {
         twitch_chat.say('#' + config['nick'], 'Vote succeeded: ' + voting_command)
         pub.send(['client-status', 'VOTING SUCCEEDED: ' + voting_command]);
 
-        // Send
-        var command_qemu = map[voting_command].replace(/^VOTE /, '');
-        console.log('Sending to qemu: ' + command_qemu);
-        pub.send(['qemu-master', command_qemu]);
+        // Replace VOTE
+        var cmd = map[voting_command].replace(/^VOTE /, '');
 
-        voting_command = null;
+        // Set mode
+        if ((cmd == 'democracy' || cmd == 'anarchy')) {
+          setCommandMode(cmd);
+        } else {
+
+          // Send Command
+          var command_qemu = cmd;
+          console.log('Sending to qemu: ' + command_qemu);
+          pub.send(['qemu-master', command_qemu]);
+        }
       } else {
         console.log('Vote failed: ' + voting_command);
         twitch_chat.say('#' + config['nick'], 'Vote failed: ' + voting_command)
         pub.send(['client-status', 'VOTING FAILED: ' + voting_command]);
-        voting_command = null;
       }
+      voting_command = null;
+
     } else if (map[selected_command].indexOf("VOTE") == 0) {
       // This command requires a vote
       console.log('Voting on command: ' + selected_command);
       twitch_chat.say('#' + config['nick'], 'Vote \'yes\' to run this command: ' + selected_command);
       pub.send(['client-status', 'VOTING ON COMMAND (yes to run this command): ' + selected_command]);
       voting_command = selected_command;
+      last_tally = {}; // in case we are in anarchy
+      
     } else if (map[selected_command] != "") {
       // Normal command, not NOOP
       console.log('Sending to qemu: ' + map[selected_command]);
       pub.send(['qemu-master', map[selected_command]]);
     }
+    
   } else {
     console.log('Not enough votes');
     twitch_chat.say('#' + config['nick'], 'Not enough votes');
     pub.send(['client-status', 'NOT ENOUGH VOTES PLACED!']);
   }
+}
 
-  // Clear last tally
-  last_tally = {};
-}, 15 * 1000);
+// Set the first voting timer
+setTimeout(processCommand, command_interval * 1000);

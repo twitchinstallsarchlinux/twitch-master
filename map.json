@@ -86,6 +86,7 @@
   "slash": "sendkey slash",
   "?": "sendkey shift-slash",
   "backslash": "sendkey backslash",
+  "|": "sendkey shift-backslash",
   "[": "sendkey bracket_left",
   "]": "sendkey bracket_right",
   "{": "sendkey shift-bracket_left",
@@ -119,7 +120,7 @@
   "alt-f9": "sendkey alt-f9",
   "ctrl-a": "sendkey ctrl-a",
   "ctrl-b": "sendkey ctrl-b",
-  "ctrl-c": "sendkey ctrl-c",
+  "ctrl-c": "VOTE sendkey ctrl-c",
   "ctrl-d": "sendkey ctrl-d",
   "ctrl-e": "sendkey ctrl-e",
   "ctrl-f": "sendkey ctrl-f",
@@ -147,5 +148,7 @@
   "system_reset": "VOTE system_reset",
   "boot_cd": "VOTE boot_set dc",
   "boot_drive": "VOTE boot_set cd",
+  "democracy": "VOTE democracy",
+  "anarchy": "VOTE anarchy",
   "yes": ""
 }
